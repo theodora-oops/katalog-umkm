@@ -3,6 +3,24 @@
 import { redirect } from "next/navigation";
 import { buatSupabaseAuth } from "@/lib/supabase";
 
+/**
+ * Memastikan ada sesi admin yang aktif.
+ * Melempar Error bila belum login, sehingga aksi yang mengubah data
+ * tidak bisa dijalankan oleh orang yang tidak berwenang.
+ */
+async function periksaLogin() {
+  const supabase = await buatSupabaseAuth();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error("Tidak terautentikasi.");
+  }
+
+  return { supabase, user };
+}
+
 export async function login(_prevState, formData) {
   const email = formData.get("email");
   const password = formData.get("password");
@@ -25,6 +43,9 @@ export async function keluar() {
 }
 
 export async function gantiPassword(_prevState, formData) {
+  // Wajib: periksa login sebelum mengubah data (aturan keamanan no. 3)
+  await periksaLogin();
+
   const passwordBaru = formData.get("password_baru");
   const konfirmasi = formData.get("konfirmasi_password");
 
