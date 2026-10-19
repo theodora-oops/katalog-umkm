@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { buatSupabaseAuth } from "@/lib/supabase";
 
-export async function login(formData) {
+export async function login(_prevState, formData) {
   const email = formData.get("email");
   const password = formData.get("password");
 
