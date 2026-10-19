@@ -24,3 +24,24 @@ export async function keluar() {
   redirect("/admin/login");
 }
 
+export async function gantiPassword(_prevState, formData) {
+  const passwordBaru = formData.get("password_baru");
+  const konfirmasi = formData.get("konfirmasi_password");
+
+  if (passwordBaru.length < 8) {
+    return { error: "Password baru minimal 8 karakter." };
+  }
+
+  if (passwordBaru !== konfirmasi) {
+    return { error: "Password baru dan konfirmasi tidak sama." };
+  }
+
+  const supabase = await buatSupabaseAuth();
+  const { error } = await supabase.auth.updateUser({ password: passwordBaru });
+
+  if (error) {
+    return { error: "Gagal mengganti password. Silakan coba lagi." };
+  }
+
+  return { berhasil: "Password berhasil diganti." };
+}
